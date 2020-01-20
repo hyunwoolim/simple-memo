@@ -17,7 +17,7 @@ import iconSet from 'quasar/icon-set/material-icons'
 
 import Vue from 'vue'
 
-import {Quasar,QInfiniteScroll,QScrollObserver,Notify,LocalStorage} from 'quasar'
+import {Quasar,QInfiniteScroll,QPullToRefresh,QScrollObserver,Notify,LocalStorage} from 'quasar'
 
 
-Vue.use(Quasar, { config: {},lang: lang,iconSet: iconSet,components: {QInfiniteScroll,QScrollObserver},plugins: {Notify,LocalStorage} })
+Vue.use(Quasar, { config: {},lang: lang,iconSet: iconSet,components: {QInfiniteScroll,QPullToRefresh,QScrollObserver},plugins: {Notify,LocalStorage} })

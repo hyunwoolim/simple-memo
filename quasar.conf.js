@@ -47,6 +47,7 @@ module.exports = function (ctx) {
 
       components: [
         'QInfiniteScroll',
+        'QPullToRefresh',
         'QScrollObserver'
       ],
       directives: [],
