@@ -15,7 +15,6 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
-
     <!--<q-drawer
       v-model="leftDrawerOpen"
       bordered
