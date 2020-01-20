@@ -5,17 +5,26 @@
         메모가 없습니다.
       </div>
       <q-list bordered separator v-show="((contents) && (contents.length > 0))">
-        <q-item clickable v-ripple v-for="item in contents" :key="item._id" @click="goPageDetail(item)">
-          <q-item-section transition="slide-right" side top v-show="showSelection">
-            <q-checkbox v-model="selection" :val="item._id" />
-          </q-item-section>
-          <q-item-section>{{ item.title }}</q-item-section>
-          <q-item-section avatar>
-            <q-avatar rounded>
-              <img src="https://cdn.quasar.dev/img/mountains.jpg">
-            </q-avatar>
-          </q-item-section>
-        </q-item>
+        <q-infinite-scroll @load="onLoad" :offset="250">
+          <q-item clickable v-ripple v-for="item in contents" :key="item._id" @click="goPageDetail(item)">
+            <q-item-section transition="slide-right" side top v-show="showSelection">
+              <q-checkbox v-model="selection" :val="item._id" />
+            </q-item-section>
+            <q-item-section>
+              {{ item.title }}
+            </q-item-section>
+            <q-item-section side top>
+              <q-item-label caption>
+                {{ $moment(item.createdDate).fromNow() }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+          <template v-slot:loading>
+            <div class="row justify-center q-my-md" v-show="paging">
+              <q-spinner-dots color="primary" size="40px" />
+            </div>
+          </template>
+        </q-infinite-scroll>
       </q-list>
     </div>
     <q-page-sticky position="bottom" :offset="[0, 12]">
@@ -29,14 +38,16 @@ export default {
   name: 'PageIndex',
   data () {
     return {
+      db: null,
       selection: [],
       showSelection: false,
       paging: true,
       options: {
         skip: 0,
-        limit: 10,
+        limit: 5,
         selector: {},
-        fields: ['_id', 'title']
+        fields: ['_id', 'title', 'createdDate'],
+        sort: [{ createdDate: 'desc' }]
       },
       contents: []
     }
@@ -46,13 +57,18 @@ export default {
     console.log('created')
     if (!me.db) {
       me.db = new me.$pouchDB('sm-content')
+      me.db.createIndex({
+        index: {
+          fields: ['createdDate']
+        }
+      }).then(function (result) {
+      })
     }
     me.search()
   },
   methods: {
     search () {
       const me = this
-      console.log('aaa')
       me.db.find(me.options).then(result => {
         if ((result.docs) && (result.docs.length > 0)) {
           result.docs.forEach(item => {
@@ -78,13 +94,14 @@ export default {
       me.$router.push({ name: 'detail', params: { id: item._id } })
     },
     onLoad (index, done) {
+      console.log('abbababab')
       const me = this
       setTimeout(() => {
         if (me.paging) {
           me.next()
           done()
         }
-      }, 2000)
+      }, 1000)
     },
     onRight ({ reset }) {
       const me = this
