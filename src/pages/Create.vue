@@ -106,7 +106,7 @@ export default {
       me.db.post({
         title: ((!me.model.title) ? '제목없음' : me.model.title),
         content: me.$refs.editor.__quill.root.innerHTML,
-        caption: me.$refs.editor.textContent.trim().substr(0, 10),
+        caption: me.$refs.editor.textContent.trim().substr(0, 32),
         createdDate: new Date()
       }).then(res => {
         if (res.ok) {

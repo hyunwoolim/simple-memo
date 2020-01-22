@@ -14,7 +14,7 @@
               <q-item-label>
                 {{ item.title }}
               </q-item-label>
-              <q-item-label caption>
+              <q-item-label caption class="item-caption">
                 {{ item.caption }}
               </q-item-label>
             </q-item-section>
@@ -98,3 +98,12 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+  .item-caption {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: inline-block;
+    overflow: hidden;
+  }
+</style>
