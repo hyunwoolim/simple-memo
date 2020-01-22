@@ -43,6 +43,7 @@
         </span>
       </div>
     </div>
+    <div :class="hasScroll ? 'q-e-fixed-height' : ''"></div>
     <div ref="editor"></div>
     <div class="q-pl-md q-pr-md q-pb-xl q-mb-xl full-width">
       <div style="border-top: 1px solid rgba(0, 0, 0, 0.24);"></div>
@@ -209,5 +210,8 @@ export default {
     margin-right: 16px;
     background-color: white !important;
     z-index: 9999;
+  }
+  .q-e-fixed-height {
+    height: 90px;
   }
 </style>
