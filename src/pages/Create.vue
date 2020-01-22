@@ -54,6 +54,7 @@
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn round color="green" icon="ion-ios-save" @click="save"/>
     </q-page-sticky>
+    <q-scroll-observer @scroll="onScroll" />
   </q-page>
 </template>
 <script>
