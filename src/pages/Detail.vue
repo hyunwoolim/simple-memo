@@ -154,7 +154,7 @@ export default {
             icon: 'ion-ios-done-all',
             message: '저장되었습니다.'
           })
-          me.$router.push({ name: 'detail', params: { id: res.id } })
+          me.$router.push({ name: 'detail', params: { id: res.id }, query: { path: Math.random() } })
         }
       }).catch(e => {
       })

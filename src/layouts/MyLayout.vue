@@ -27,8 +27,7 @@
             <q-icon name="ion-ios-list" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>메모장</q-item-label>
-            <!--<q-item-label caption></q-item-label>-->
+            <q-item-label>메모 목록</q-item-label>
           </q-item-section>
         </q-item>
         <q-item clickable tag="a" target="_blank" @click="goPageSetting">

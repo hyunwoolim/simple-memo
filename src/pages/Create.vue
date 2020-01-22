@@ -108,7 +108,6 @@ export default {
         createdDate: new Date()
       }).then(res => {
         if (res.ok) {
-          console.log(res)
           me.$q.notify({
             timeout: 100,
             color: 'green',
@@ -116,7 +115,7 @@ export default {
             icon: 'ion-ios-done-all',
             message: '저장되었습니다.'
           })
-          me.$router.push({ name: 'detail', params: { id: res.id } })
+          me.$router.push({ name: 'detail', params: { id: res.id }, query: { path: Math.random() } })
         }
       }).catch(function (err) {
         console.log(err)

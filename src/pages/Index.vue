@@ -5,26 +5,26 @@
         메모가 없습니다.
       </div>
       <q-list bordered separator v-show="((contents) && (contents.length > 0))">
-        <q-item clickable v-ripple v-for="item in contents" :key="item._id" @click="goPageDetail(item)">
-          <q-item-section>
-            <q-item-label>
-              {{ item.title }}
-            </q-item-label>
-            <q-item-label caption>
-              {{ item.caption }}
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side top>
-            <q-item-label caption>
-              {{ $moment(item.createdDate).fromNow() }}
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-        <template v-slot:loading>
-          <div class="row justify-center q-my-md" v-show="paging">
-            <q-spinner-dots color="primary" size="40px" />
-          </div>
-        </template>
+        <q-slide-item v-for="item in contents" :key="item._id" @right="onRight(item)" right-color="red">
+          <template v-slot:right>
+            <q-icon name="ion-ios-trash" />
+          </template>
+          <q-item>
+            <q-item-section @click="goPageDetail(item)">
+              <q-item-label>
+                {{ item.title }}
+              </q-item-label>
+              <q-item-label caption>
+                {{ item.caption }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side top @click="goPageDetail(item)">
+              <q-item-label caption>
+                {{ $moment(item.createdDate).fromNow() }}
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-slide-item>
       </q-list>
     </div>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
@@ -38,15 +38,9 @@ export default {
   data () {
     return {
       db: null,
-      selection: [],
-      showSelection: false,
-      hasSelection: false,
-      paging: true,
       options: {
-        skip: 0,
-        limit: 5,
         selector: {},
-        fields: ['_id', 'title', 'content', 'caption', 'createdDate'],
+        fields: ['_id', '_rev', 'title', 'content', 'caption', 'createdDate'],
         sort: [{ createdDate: 'desc' }]
       },
       contents: []
@@ -54,41 +48,24 @@ export default {
   },
   created () {
     const me = this
-    me.initDB()
+    if (!me.db) {
+      me.db = new me.$pouchDB('sm-content')
+      me.db.createIndex({
+        index: {
+          fields: ['createdDate']
+        }
+      }).then(res => {
+      }).catch(e => {
+      })
+    }
     me.search()
   },
   methods: {
-    initData () {
-      const me = this
-      me.selection = []
-      me.showSelection = false
-      me.paging = true
-      /* skip: 0,
-      limit: 5, */
-      me.options = {
-        selector: {},
-        fields: ['_id', 'title', 'content', 'caption', 'createdDate'],
-        sort: [{ createdDate: 'desc' }]
-      }
-      me.contents = []
-    },
-    initDB () {
-      const me = this
-      if (!me.db) {
-        me.db = new me.$pouchDB('sm-content')
-        me.db.createIndex({
-          index: {
-            fields: ['createdDate']
-          }
-        }).then(res => {
-        }).catch(e => {
-        })
-      }
-    },
     search () {
       const me = this
       me.db.find(me.options).then(res => {
         me.contents = res.docs
+      }).catch(e => {
       })
     },
     goPageCreate () {
@@ -97,7 +74,26 @@ export default {
     },
     goPageDetail (item) {
       const me = this
-      me.$router.push({ name: 'detail', params: { id: item._id } })
+      me.$router.push({ name: 'detail', params: { id: item._id }, query: { path: Math.random() } })
+    },
+    onRight (item) {
+      const me = this
+      me.deleteItem(item)
+    },
+    deleteItem (item) {
+      const me = this
+      me.db.remove(item, { force: true }).then(res => {
+        if (res.ok) {
+          me.$q.notify({
+            timeout: 100,
+            color: 'green',
+            position: 'top-right',
+            icon: 'ion-ios-done-all',
+            message: '삭제되었습니다.'
+          })
+          me.search()
+        }
+      })
     }
   }
 }
