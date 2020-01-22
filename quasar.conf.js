@@ -12,12 +12,10 @@ module.exports = function (ctx) {
       'moment',
       'pouchdb'
     ],
-
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: [
       'app.sass'
     ],
-
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       'ionicons-v4',
@@ -30,7 +28,6 @@ module.exports = function (ctx) {
       'roboto-font', // optional, you are not bound to it
       'material-icons' // optional, you are not bound to it
     ],
-
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
       iconSet: 'material-icons', // Quasar icon set
@@ -44,7 +41,6 @@ module.exports = function (ctx) {
       // * true   - Import everything from Quasar
       //            (not treeshaking Quasar; biggest bundle size; convenient)
       all: 'auto',
-
       components: [
         'QInfiniteScroll',
         'QPullToRefresh',
@@ -58,10 +54,8 @@ module.exports = function (ctx) {
         'LocalStorage'
       ]
     },
-
     // https://quasar.dev/quasar-cli/cli-documentation/supporting-ie
     supportIE: true,
-
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       scopeHoisting: true,
