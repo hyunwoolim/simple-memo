@@ -117,8 +117,7 @@ export default {
           })
           me.$router.push({ name: 'detail', params: { id: res.id }, query: { path: Math.random() } })
         }
-      }).catch(function (err) {
-        console.log(err)
+      }).catch(e => {
       })
     },
     onScroll (info) {

@@ -54,7 +54,7 @@
       <q-btn round color="green" icon="ion-ios-save" @click="save"/>
     </q-page-sticky>
     <q-page-sticky position="bottom-right" :offset="[72, 18]">
-      <q-btn round color="grey" icon="ion-ios-trash" @click="confirmDelete = true"/>
+      <q-btn round color="grey" icon="ion-ios-trash" @click="confirmDeleteItem(model)"/>
     </q-page-sticky>
     <q-dialog v-model="confirmDelete" persistent>
       <q-card>
@@ -154,7 +154,8 @@ export default {
             icon: 'ion-ios-done-all',
             message: '저장되었습니다.'
           })
-          me.$router.push({ name: 'detail', params: { id: res.id }, query: { path: Math.random() } })
+          me.search()
+          // me.$router.push({ name: 'detail', params: { id: res.id }, query: { path: Math.random() } })
         }
       }).catch(e => {
       })
@@ -163,14 +164,13 @@ export default {
       const me = this
       me.editMode = !me.editMode
     },
-    cancelEdit () {
+    confirmDeleteItem () {
       const me = this
-      me.editMode = false
-      me.search()
+      me.confirmDelete = true
     },
-    deleteItem (item) {
+    deleteItem (model) {
       const me = this
-      me.db.remove(me.model, { force: true }).then(res => {
+      me.db.remove(model, { force: true }).then(res => {
         if (res.ok) {
           me.$q.notify({
             timeout: 100,
