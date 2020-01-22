@@ -1,94 +1,114 @@
 <template>
   <q-page>
     <div class="q-pa-md full-width">
-      <div class="row">
-        <div class="col-xs-4 text-left q-mb-md">
-          <q-btn outline label="목록" @click="goPageIndex"></q-btn>
-        </div>
-        <div class="col-xs-8 text-right q-mb-md">
-          <q-btn class="q-mr-md" v-show="!editMode" outline label="수정" @click="edit"/>
-          <q-btn v-show="!editMode" outline label="삭제" @click="confirmDeleteItem(model)"/>
-          <q-btn class="q-mr-md" v-show="editMode" outline label="저장하지 않기" @click="cancelEdit"/>
-          <q-btn v-show="editMode" outline label="저장" @click="save"/>
-        </div>
-      </div>
-      <q-input square outlined label="제목" v-model="model.title" v-show="editMode" class="full-width q-mb-md" style="overflow: hidden; word-break: keep-all;"/>
-      <div v-show="!editMode" class="text-center q-mt-xl q-mb-xl">
-        <h5>{{ model.title }}</h5>
-        <div class="text-right">{{$moment(model.createdDate).format('LLLL')}}</div>
-      </div>
-      <!--<vue-editor v-model="model.content" :editor-toolbar="customToolbar" :editorOptions="editorSettings" />-->
-      <vue-editor class="full-width" v-show="editMode" v-model="model.content" :editorOptions="options"/>
-      <div class="quillWrapper" v-show="!editMode">
-        <div class="ql-container ql-snow" style="border: none;">
-          <div class="ql-editor" v-html="model.content" style="padding: 0;"></div>
-        </div>
-      </div>
-      <div v-show="hasScroll" class="row q-mt-md">
-        <div class="col-xs-4 text-left">
-          <q-btn outline label="목록" @click="goPageIndex"></q-btn>
-        </div>
-        <div class="col-xs-8 text-right">
-          <q-btn class="q-mr-md" v-show="!editMode" outline label="수정" @click="edit"/>
-          <q-btn v-show="!editMode" outline label="삭제" @click="confirmDeleteItem(model)"/>
-          <q-btn class="q-mr-md" v-show="editMode" outline label="저장하지 않기" @click="cancelEdit"/>
-          <q-btn v-show="editMode" outline label="저장" @click="save"/>
-        </div>
+      <q-input square outlined label="제목" v-model="model.title" class="full-width q-mb-md"/>
+      <div id="toolbar" ref="toolbar">
+        <span class="ql-formats">
+          <select class="ql-align"></select>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-size">
+            <option value="huge">매우 크게</option>
+            <option value="large">크게</option>
+            <option selected>보통</option>
+            <option value="small">작게</option>
+          </select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+          <button class="ql-strike"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-blockquote"></button>
+          <button class="ql-code-block"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-color"></select>
+          <select class="ql-background"></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link"></button>
+          <button class="ql-image"></button>
+          <button class="ql-video"></button>
+          <button class="ql-formula"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean"></button>
+        </span>
       </div>
     </div>
+    <div ref="editor"></div>
+    <div class="q-pl-md q-pr-md q-pb-xl q-mb-xl full-width">
+      <div style="border-top: 1px solid rgba(0, 0, 0, 0.24);"></div>
+    </div>
+    <q-page-sticky position="bottom-left" :offset="[18, 18]">
+      <q-btn round color="primary" icon="ion-ios-list" @click="goPageIndex"/>
+    </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn round color="green" icon="ion-ios-save" @click="save"/>
+    </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[72, 18]">
+      <q-btn round color="grey" icon="ion-ios-trash" @click="confirmDelete = true"/>
+    </q-page-sticky>
     <q-dialog v-model="confirmDelete" persistent>
       <q-card>
+        <q-bar>
+          <q-icon name="ion-ios-trash" />
+          <div>메모 삭제</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>닫기</q-tooltip>
+          </q-btn>
+        </q-bar>
         <q-card-section>
-          <div class="text-h6">메모 삭제</div>
-        </q-card-section>
-        <q-card-section class="q-pt-none">
           <div>이 메모를 삭제하시겠습니까?</div>
           <div>삭제된 메모는 복구할 수 없습니다.</div>
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="취소" color="primary" v-close-popup />
+        <q-card-section class="q-pt-none text-right">
           <q-btn flat label="삭제" color="primary" @click="deleteItem(model)" />
-        </q-card-actions>
+        </q-card-section>
       </q-card>
     </q-dialog>
     <q-scroll-observer @scroll="onScroll" />
   </q-page>
 </template>
 <script>
-import { VueEditor } from 'vue2-editor'
-// import { VueEditor, Quill } from 'vue2-editor'
-// import { ImageDrop } from 'quill-image-drop-module'
-// import { ImageResize } from 'quill-image-resize-module'
-// Quill.register('modules/imageDrop', ImageDrop)
-// Quill.register('modules/imageResize', ImageResize)
-
+import Quill from 'quill/dist/quill.min'
+import 'quill/dist/quill.snow.css'
 export default {
-  name: 'PageCreate',
+  name: 'PageDetail',
   props: [
     'id'
   ],
   data () {
     return {
       db: null,
+      quill: null,
+      editor: null,
+      readonly: false,
       hasScroll: false,
       editMode: false,
       confirmDelete: false,
       model: {
         title: '',
-        content: ''
+        content: '',
+        caption: '',
+        createdDate: null
       },
       options: {
-        /* modules: {
-          imageDrop: true,
-          imageResize: {
-            displaySize: true
-          }
-        } */
+        modules: {
+          toolbar: '#toolbar'
+        },
+        placeholder: '터치하여 입력하세요.',
+        theme: 'snow'
       }
     }
-  },
-  components: {
-    VueEditor
   },
   created () {
     const me = this
@@ -96,13 +116,47 @@ export default {
     if (!me.db) {
       me.db = new me.$pouchDB('sm-content')
     }
+  },
+  mounted () {
+    const me = this
+    let container = me.$refs.editor
+    let editor = new Quill(container, me.options)
+    me.editor = editor
     me.search()
   },
   methods: {
+    goPageIndex () {
+      const me = this
+      me.$router.push({ name: 'index' })
+    },
     search () {
       const me = this
       me.db.get(me.id).then((result) => {
         me.model = result
+        me.$refs.editor.__quill.root.innerHTML = me.model.content
+      })
+    },
+    save () {
+      const me = this
+      me.db.put({
+        _id: me.model._id,
+        _rev: me.model._rev,
+        title: ((!me.model.title) ? '제목없음' : me.model.title),
+        content: me.$refs.editor.__quill.root.innerHTML,
+        caption: me.$refs.editor.textContent.trim().substr(0, 10),
+        createdDate: new Date()
+      }, { force: true }).then(res => {
+        if (res.ok) {
+          me.$q.notify({
+            timeout: 100,
+            color: 'green',
+            position: 'top-right',
+            icon: 'ion-ios-done-all',
+            message: '저장되었습니다.'
+          })
+          me.$router.push({ name: 'detail', params: { id: res.id } })
+        }
+      }).catch(e => {
       })
     },
     edit () {
@@ -129,31 +183,6 @@ export default {
         }
       })
     },
-    confirmDeleteItem (item) {
-      const me = this
-      me.confirmDelete = true
-    },
-    save () {
-      const me = this
-      me.db.put(me.model, { force: true }).then(res => {
-        if (res.ok) {
-          me.$q.notify({
-            timeout: 100,
-            color: 'green',
-            position: 'top-right',
-            icon: 'ion-ios-done-all',
-            message: '저장되었습니다.'
-          })
-        }
-        me.editMode = false
-      }).catch(function (err) {
-        console.log(err)
-      })
-    },
-    goPageIndex () {
-      const me = this
-      me.$router.push({ name: 'index' })
-    },
     onScroll (info) {
       const me = this
       if (info.position > 50) {
@@ -165,3 +194,13 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+  .ql-tooltip {
+    z-index: 9999 !important;
+  }
+  .ql-container.ql-snow {
+    border: none;
+  }
+  .ql-toolbar.ql-snow {
+  }
+</style>

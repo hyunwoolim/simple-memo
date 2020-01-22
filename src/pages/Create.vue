@@ -1,57 +1,85 @@
 <template>
   <q-page>
     <div class="q-pa-md full-width">
-      <div class="row q-mb-md">
-        <div class="col-xs-6 text-left">
-          <q-btn outline label="목록" @click="goPageIndex"></q-btn>
-        </div>
-        <div class="col-xs-6 text-right">
-          <q-btn outline label="저장" @click="save"/>
-        </div>
-      </div>
-      <q-input square outlined label="제목" v-model="title" class="full-width q-mb-md"/>
-      <!--<vue-editor v-model="model.content" :editor-toolbar="customToolbar" :editorOptions="editorSettings" />-->
-      <vue-editor class="full-width" v-model="content" :editorOptions="options"/>
-      <div v-show="hasScroll" class="row q-mt-md">
-        <div class="col-xs-6 text-left">
-          <q-btn outline label="목록" @click="goPageIndex"></q-btn>
-        </div>
-        <div class="col-xs-6 text-right">
-          <q-btn outline label="저장" @click="save"/>
-        </div>
+      <q-input square outlined label="제목" v-model="model.title" class="full-width q-mb-md"/>
+      <div id="toolbar" ref="toolbar">
+        <span class="ql-formats">
+          <select class="ql-align"></select>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-size">
+            <option value="huge">매우 크게</option>
+            <option value="large">크게</option>
+            <option selected>보통</option>
+            <option value="small">작게</option>
+          </select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+          <button class="ql-strike"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-blockquote"></button>
+          <button class="ql-code-block"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-color"></select>
+          <select class="ql-background"></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link"></button>
+          <button class="ql-image"></button>
+          <button class="ql-video"></button>
+          <button class="ql-formula"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean"></button>
+        </span>
       </div>
     </div>
-    <q-scroll-observer @scroll="onScroll" />
+    <div ref="editor"></div>
+    <div class="q-pl-md q-pr-md q-pb-xl q-mb-xl full-width">
+      <div style="border-top: 1px solid rgba(0, 0, 0, 0.24);"></div>
+    </div>
+    <q-page-sticky position="bottom-left" :offset="[18, 18]">
+      <q-btn round color="primary" icon="ion-ios-list" @click="goPageIndex"/>
+    </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn round color="green" icon="ion-ios-save" @click="save"/>
+    </q-page-sticky>
   </q-page>
 </template>
 <script>
-import { VueEditor } from 'vue2-editor'
-// import { VueEditor, Quill } from 'vue2-editor'
-// import { ImageDrop } from 'quill-image-drop-module'
-// import { ImageResize } from 'quill-image-resize-module'
-// Quill.register('modules/imageDrop', ImageDrop)
-// Quill.register('modules/imageResize', ImageResize)
-
+import Quill from 'quill/dist/quill.min'
+import 'quill/dist/quill.snow.css'
 export default {
   name: 'PageCreate',
   data () {
     return {
       db: null,
+      quill: null,
+      editor: null,
       hasScroll: false,
-      title: '',
-      content: '',
+      model: {
+        title: '',
+        content: '',
+        caption: '',
+        createdDate: null
+      },
       options: {
-        /* modules: {
-          imageDrop: true,
-          imageResize: {
-            displaySize: true
-          }
-        } */
+        modules: {
+          toolbar: '#toolbar'
+        },
+        placeholder: '터치하여 입력하세요.',
+        theme: 'snow'
       }
     }
-  },
-  components: {
-    VueEditor
   },
   created () {
     const me = this
@@ -59,6 +87,12 @@ export default {
     if (!me.db) {
       me.db = new me.$pouchDB('sm-content')
     }
+  },
+  mounted () {
+    const me = this
+    let container = me.$refs.editor
+    let editor = new Quill(container, me.options)
+    me.editor = editor
   },
   methods: {
     goPageIndex () {
@@ -68,11 +102,13 @@ export default {
     save () {
       const me = this
       me.db.post({
-        title: ((!me.title) ? '제목없음' : me.title),
-        content: me.content,
+        title: ((!me.model.title) ? '제목없음' : me.model.title),
+        content: me.$refs.editor.__quill.root.innerHTML,
+        caption: me.$refs.editor.textContent.trim().substr(0, 10),
         createdDate: new Date()
       }).then(res => {
         if (res.ok) {
+          console.log(res)
           me.$q.notify({
             timeout: 100,
             color: 'green',
@@ -97,3 +133,13 @@ export default {
   }
 }
 </script>
+<style scoped lang="scss">
+  .ql-tooltip {
+    z-index: 9999 !important;
+  }
+  .ql-container.ql-snow {
+    border: none;
+  }
+  .ql-toolbar.ql-snow {
+  }
+</style>

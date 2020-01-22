@@ -17,18 +17,22 @@
     </div>
     <q-dialog v-model="confirmDestroy" persistent>
       <q-card>
+        <q-bar>
+          <q-icon name="ion-ios-trash" />
+          <div>데이터 초기화</div>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip>닫기</q-tooltip>
+          </q-btn>
+        </q-bar>
         <q-card-section>
-          <div class="text-h6">데이터 초기화</div>
-        </q-card-section>
-        <q-card-section class="q-pt-none">
           <div>초기화를 위해 <b>'완전삭제'</b>를 입력해주세요.</div>
           <div>모든 데이터가 삭제됩니다.</div>
           <q-input dense ref="confirmDestroyMessage" v-model="confirmDestroyMessage" autofocus :rules="[val => (val === '완전삭제') || '삭제할 수 없습니다.']" lazy-rules/>
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="취소" color="primary" v-close-popup />
+        <q-card-section class="q-pt-none text-right">
           <q-btn flat label="초기화" color="primary" @click="destroyDB"/>
-        </q-card-actions>
+        </q-card-section>
       </q-card>
     </q-dialog>
   </q-page>
