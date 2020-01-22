@@ -2,7 +2,7 @@
   <q-page>
     <div class="q-pa-md full-width">
       <q-input square outlined label="제목" v-model="model.title" class="full-width q-mb-md"/>
-      <div id="toolbar" ref="toolbar">
+      <div id="toolbar" ref="toolbar" :class="hasScroll ? 'q-e-fixed-toolbar ql-toolbar ql-snow' : 'ql-toolbar ql-snow'">
         <span class="ql-formats">
           <select class="ql-align"></select>
         </span>
@@ -155,7 +155,6 @@ export default {
             message: '저장되었습니다.'
           })
           me.search()
-          // me.$router.push({ name: 'detail', params: { id: res.id }, query: { path: Math.random() } })
         }
       }).catch(e => {
       })
@@ -185,7 +184,8 @@ export default {
     },
     onScroll (info) {
       const me = this
-      if (info.position > 50) {
+      console.log(info)
+      if (info.position > 88) {
         me.hasScroll = true
       } else {
         me.hasScroll = false
@@ -202,5 +202,12 @@ export default {
     border: none;
   }
   .ql-toolbar.ql-snow {
+  }
+  .q-e-fixed-toolbar {
+    position: fixed;
+    top: 50px;
+    margin-right: 16px;
+    background-color: white !important;
+    z-index: 9999;
   }
 </style>

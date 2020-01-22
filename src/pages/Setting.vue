@@ -66,12 +66,28 @@ export default {
       if (me.confirmDestroyMessage === '완전삭제') {
         if (me.db) {
           me.db.destroy().then(res => {
+            me.$q.notify({
+              timeout: 100,
+              color: 'blue',
+              position: 'top-right',
+              icon: 'ion-ios-done-all',
+              message: '초기화되었습니다.'
+            })
             me.confirmDestroy = false
+            me.confirmDestroyMessage = ''
           })
         } else {
           me.db = new me.$pouchDB('sm-content')
           me.db.destroy().then(res => {
+            me.$q.notify({
+              timeout: 100,
+              color: 'blue',
+              position: 'top-right',
+              icon: 'ion-ios-done-all',
+              message: '초기화되었습니다..'
+            })
             me.confirmDestroy = false
+            me.confirmDestroyMessage = ''
           })
         }
       }
